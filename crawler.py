@@ -114,6 +114,7 @@ def check_btc_talk(last_post_checked):
 def main():
     """Loop and exception handling"""
     last_post_checked = feedparser.parse(BITCOIN_TALK_RSS)['entries'][0]['id'] # don't spend a bunch of time parsing old comments
+    print('Running...')
     while True:
         try:
             last_post_checked = check_btc_talk(last_post_checked)
