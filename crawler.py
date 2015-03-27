@@ -62,8 +62,9 @@ def check_post_strings(url, kwd=KEYWORDS):
     post_id_elem = html.find('a', href=url)
     if post_id_elem is None: # bitcoin talk returning bad HTML
         with open("btb_log.txt", "a") as btblog:
-            btblog.write('Bad HTML (503?), bailing...')
+            btblog.write('\nBad HTML (503?), bailing...')
             btblog.write(html[:100])
+            btblog.write('\n')
         raise Exception('Bad HTML, possible 503')
     post = post_id_elem.find_next('div', {'class': 'post'})
 
@@ -97,11 +98,13 @@ def check_btc_talk(last_post_checked):
         if 'id' not in entry or (last_post_checked is not None and get_post_id(entry['id']) <= get_post_id(last_post_checked)):
             continue
         with open("btb_log.txt", "a") as btblog:
+            btblog.write('\n')
             btblog.write(entry['id'])
         try:
             mentions = check_post_strings(entry['id'], KEYWORDS)
             if len(mentions):
                 with open("btb_log.txt", "a") as btblog:
+                    btblog.write('\n')
                     btblog.write('Found a mention, posting to slack...')
                 slack.chat.post_message(SLACK_CHANNEL, MESSAGE_FORMAT.format(entry['title'], entry['id'], '\n'.join(mentions)), username=SLACK_USERNAME)
             last_post_checked = entry['id']
@@ -109,6 +112,7 @@ def check_btc_talk(last_post_checked):
             if isinstance(e, KeyboardInterrupt):
                 raise e
             with open("btb_log.txt", "a") as btblog:
+                btblog.write('\n')
                 btblog.write('Unhandled exception, retrying feed parse at exception point')
             traceback.print_exc()
             break
@@ -119,6 +123,7 @@ def main():
     """Loop and exception handling"""
     last_post_checked = feedparser.parse(BITCOIN_TALK_RSS)['entries'][0]['id'] # don't spend a bunch of time parsing old comments
     with open("btb_log.txt", "a") as btblog:
+        btblog.write('\n')
         btblog.write('Running')
     while True:
         try:
@@ -127,6 +132,7 @@ def main():
         except Exception as e:
             if isinstance(e, KeyboardInterrupt):
                 with open("btb_log.txt", "a") as btblog:
+                    btblog.write('\n')
                     btblog.write('Being killed! Exiting...')
                 break
             print('Unexpected exception, trying to continue...')
