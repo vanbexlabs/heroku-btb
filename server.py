@@ -5,4 +5,4 @@ import os
 def index():
     return '<b>Hello <b>'
 
-run(host='localhost', port=os.environ['PORT'])
+run(host='0.0.0.0', port=os.environ['PORT'])
