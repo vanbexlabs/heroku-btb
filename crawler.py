@@ -103,13 +103,14 @@ def check_btc_talk(last_post_checked):
         with open("btb_log.txt", "a") as btblog:
             btblog.write(addtime() + '<br>')
             btblog.write(entry['id'])
-
+            btblog.write('<br>')
         try:
             mentions = check_post_strings(entry['id'], KEYWORDS)
             if len(mentions):
                 with open("btb_log.txt", "a") as btblog:
                     btblog.write(addtime() + '<br>')
                     btblog.write('Found a mention, posting to slack...')
+                    btblog.write('<br>')
                 slack.chat.post_message(SLACK_CHANNEL, MESSAGE_FORMAT.format(entry['title'], entry['id'], '\n'.join(mentions)), username=SLACK_USERNAME)
             last_post_checked = entry['id']
         except Exception as e:
@@ -118,6 +119,7 @@ def check_btc_talk(last_post_checked):
             with open("btb_log.txt", "a") as btblog:
                 btblog.write(addtime() + '<br>')
                 btblog.write('Unhandled exception, retrying feed parse at exception point')
+                btblog.write('<br>')
             traceback.print_exc()
             break
         time.sleep(1)
@@ -129,6 +131,7 @@ def main():
     with open("btb_log.txt", "a") as btblog:
         btblog.write(addtime() + '<br>')
         btblog.write('Running')
+        btblog.write('<br>')
     while True:
         try:
             last_post_checked = check_btc_talk(last_post_checked)
