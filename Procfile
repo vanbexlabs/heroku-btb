@@ -1,1 +1,1 @@
-web: python crawler.py & && python server.py
+web: bash run.sh
