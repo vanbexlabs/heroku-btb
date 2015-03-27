@@ -3,6 +3,6 @@ import os
 
 @route('/')
 def index():
-    return '<b>Hello <b>'
+    return open('./btb_log.txt').readlines()
 
 run(host='0.0.0.0', port=os.environ['PORT'])

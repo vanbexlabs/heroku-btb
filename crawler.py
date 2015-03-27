@@ -61,8 +61,9 @@ def check_post_strings(url, kwd=KEYWORDS):
     html = bs4.BeautifulSoup(requests.get(url).text)
     post_id_elem = html.find('a', href=url)
     if post_id_elem is None: # bitcoin talk returning bad HTML
-        print('Bad HTML (503?), bailing...')
-        print(html[:100])
+        with open("btb_log.txt", "a") as btblog:
+            btblog.write('Bad HTML (503?), bailing...')
+            btblog.write(html[:100])
         raise Exception('Bad HTML, possible 503')
     post = post_id_elem.find_next('div', {'class': 'post'})
 
@@ -95,17 +96,20 @@ def check_btc_talk(last_post_checked):
     for entry in reversed(feed['entries']):
         if 'id' not in entry or (last_post_checked is not None and get_post_id(entry['id']) <= get_post_id(last_post_checked)):
             continue
-        print(entry['id'])
+        with open("btb_log.txt", "a") as btblog:
+            btblog.write(entry['id'])
         try:
             mentions = check_post_strings(entry['id'], KEYWORDS)
             if len(mentions):
-                print('Found a mention, posting to slack...')
+                with open("btb_log.txt", "a") as btblog:
+                    btblog.write('Found a mention, posting to slack...')
                 slack.chat.post_message(SLACK_CHANNEL, MESSAGE_FORMAT.format(entry['title'], entry['id'], '\n'.join(mentions)), username=SLACK_USERNAME)
             last_post_checked = entry['id']
         except Exception as e:
             if isinstance(e, KeyboardInterrupt):
                 raise e
-            print('Unhandled exception, retrying feed parse at exception point')
+            with open("btb_log.txt", "a") as btblog:
+                btblog.write('Unhandled exception, retrying feed parse at exception point')
             traceback.print_exc()
             break
         time.sleep(1)
@@ -114,15 +118,16 @@ def check_btc_talk(last_post_checked):
 def main():
     """Loop and exception handling"""
     last_post_checked = feedparser.parse(BITCOIN_TALK_RSS)['entries'][0]['id'] # don't spend a bunch of time parsing old comments
-    print('Running...')
+    with open("btb_log.txt", "a") as btblog:
+        btblog.write('Running')
     while True:
         try:
-            print('running');
             last_post_checked = check_btc_talk(last_post_checked)
             time.sleep(1)
         except Exception as e:
             if isinstance(e, KeyboardInterrupt):
-                print('Being killed! Exiting...')
+                with open("btb_log.txt", "a") as btblog:
+                    btblog.write('Being killed! Exiting...')
                 break
             print('Unexpected exception, trying to continue...')
             traceback.print_exc()
