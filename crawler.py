@@ -10,6 +10,11 @@ import slack.chat
 import time
 import traceback
 import urllib.parse
+from bottle import route, run, template
+
+@route('/')
+def index(name):
+    return template('<b>Hello <b>')
 
 KEYWORDS = ['Storj', 'Storj Labs', 'SJCX', 'Storjcoin X', 'Storjcoin']
 PING_TIME = 2  # how many seconds to wait between checking BitcoinTalk
@@ -128,3 +133,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    run(host='0.0.0.0', port=80)

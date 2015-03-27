@@ -1,4 +1,5 @@
 -e git+https://code.google.com/p/feedparser/#egg=feedparser
+bottle
 beautifulsoup4
 requests
 pyslack
